@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Midseason Bracket</title>
+<title>The Scumbag Invitational</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -326,7 +326,7 @@
 
 <div class="marquee">
   <div class="eyebrow">ESPN Fantasy Football · 2026 Season</div>
-  <h1>Midseason Bracket</h1>
+  <h1>The Scumbag Invitational</h1>
   <div class="sub">14 teams · single elimination · weeks 8&nbsp;→&nbsp;11</div>
   <div class="kickoff" id="kickoffLine"></div>
 </div>
@@ -751,7 +751,7 @@
     const f = BRACKET[3][0], banner = $('championBanner');
     if(f.complete){
       const champ = f.winner === 'A' ? f.teamA : f.teamB;
-      banner.innerHTML = `<div class="plate">🏆 ${esc(champ.name)} — Midseason Champion</div>`;
+      banner.innerHTML = `<div class="plate">🏆 ${esc(champ.name)} — Scumbag Invitational Champion</div>`;
     } else banner.innerHTML = '';
   }
 
