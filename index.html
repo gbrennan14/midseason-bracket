@@ -143,6 +143,12 @@
   }
   .sync-row{text-align:center;margin-top:12px;}
   button:disabled{opacity:.6;cursor:wait;}
+  .tag-live{background:var(--out-bg);color:var(--alert);border:1px solid var(--alert);display:inline-flex;align-items:center;gap:5px;}
+  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--alert);animation:pulseDot 1.2s ease-in-out infinite;}
+  @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.25}}
+  .team-score.live{font-style:italic;color:var(--text-dim);}
+  .team-score.live.lead{color:var(--gold);}
+  @media (prefers-reduced-motion: reduce){.live-dot{animation:none;}}
   .section-label{
     font-family:'Space Mono',ui-monospace,monospace;
     font-size:11px;
@@ -275,6 +281,26 @@
   button.primary:hover{opacity:.9;color:var(--primary-fg);}
   button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 
+  .mull-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .mull select, .mull input[type=password]{
+    font-family:'Inter',system-ui,sans-serif;font-size:14px;
+    background:var(--field);border:1px solid var(--line);color:var(--text);
+    border-radius:var(--radius);padding:9px 12px;min-width:240px;max-width:100%;
+  }
+  .mull-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:760px;margin-bottom:12px;}
+  .mull-grid label{display:block;font-family:'Space Mono',ui-monospace,monospace;font-size:11px;color:var(--text-dim);margin-bottom:6px;letter-spacing:0.04em;}
+  .mull-grid select{width:100%;min-width:0;}
+  .mull-note{font-size:13px;color:var(--text-dim);line-height:1.6;margin:0 0 12px;max-width:760px;}
+  .mull-note.err{color:var(--alert);}
+  .mull-preview{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;font-size:13px;line-height:1.6;max-width:760px;margin-bottom:12px;}
+  .mull-log{max-width:760px;margin-top:18px;}
+  .mull-log-row{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:8px 12px;margin-bottom:6px;font-size:13px;line-height:1.5;}
+  .mull-log-row.void{opacity:.55;text-decoration:line-through;}
+  .mull-log-row .when{font-family:'Space Mono',ui-monospace,monospace;font-size:11px;color:var(--text-dim);display:block;}
+  .mull-glyph{color:var(--gold);font-size:12px;margin-left:5px;cursor:help;}
+  .mull details{margin-top:16px;max-width:760px;font-size:13px;color:var(--text-dim);}
+  .mull details summary{cursor:pointer;}
+  @media (max-width:560px){.mull-grid{grid-template-columns:1fr;}.mull select,.mull input[type=password]{min-width:0;width:100%;}}
   .predict-intro{font-size:13px;color:var(--text-dim);line-height:1.6;margin:0 0 14px;max-width:760px;}
   .predict-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
   .predict-controls input[type=text]{
@@ -327,7 +353,7 @@
 <div class="marquee">
   <div class="eyebrow">ESPN Fantasy Football · 2026 Season</div>
   <h1>The Scumbag Invitational</h1>
-  <div class="sub">14 teams · single elimination · weeks 8&nbsp;→&nbsp;11</div>
+  <div class="sub" id="subLine"></div>
   <div class="kickoff" id="kickoffLine"></div>
 </div>
 <div class="status-bar" id="statusBar"></div>
@@ -348,6 +374,21 @@
 <div class="section-label">Bracket</div>
 <div class="bracket-wrap"><div class="bracket" id="bracketEl"></div></div>
 <div class="champion-banner" id="championBanner"></div>
+
+<div class="section-label">Mulligans</div>
+<div class="mull" id="mullSection">
+  <p class="predict-intro" id="mullIntro"></p>
+  <div class="mull-controls"><select id="mullTeam" aria-label="Choose your team"></select></div>
+  <div id="mullPanel"></div>
+  <div class="mull-log" id="mullLog"></div>
+  <details id="mullAdmin">
+    <summary>Commissioner</summary>
+    <div class="mull-controls" style="margin-top:10px;">
+      <input type="password" id="mullKey" placeholder="Commissioner key" autocomplete="off">
+    </div>
+    <div id="mullAdminList"></div>
+  </details>
+</div>
 
 <div class="section-label">Bracket predictions</div>
 <div class="predictions" id="predictionsSection">
@@ -380,25 +421,31 @@
 
 <div class="footnote" id="footnote"></div>
 
+<script src="config.js"></script>
 <script id="league-data" type="application/json">{"updatedAt": "2026-10-06T01:35:32Z", "asOfWeek": 3, "seedsFinal": false, "seedsThroughWeek": 7, "predictionsOpen": true, "teams": [{"id": 1, "name": "52 BigPwilleyStyle", "wins": 2, "losses": 1, "pf": 389.58}, {"id": 2, "name": "Ski Fast Eat Ass", "wins": 1, "losses": 2, "pf": 269.1}, {"id": 3, "name": "#1 Goyim", "wins": 1, "losses": 2, "pf": 359.1}, {"id": 5, "name": "Green Bay Fappers", "wins": 2, "losses": 1, "pf": 375.32}, {"id": 7, "name": "Kraft Sack N' Steez", "wins": 2, "losses": 1, "pf": 262.4}, {"id": 8, "name": "Sweet Ivory Meat", "wins": 1, "losses": 2, "pf": 348.46}, {"id": 9, "name": "DoorDashEnthusiast", "wins": 2, "losses": 1, "pf": 407.74}, {"id": 10, "name": "Lickalottapus", "wins": 3, "losses": 0, "pf": 416.88}, {"id": 11, "name": "Girth Brooks", "wins": 1, "losses": 2, "pf": 311.38}, {"id": 12, "name": "Willey good team", "wins": 1, "losses": 2, "pf": 310.7}, {"id": 13, "name": "Big Dick Bandits", "wins": 2, "losses": 1, "pf": 394.24}, {"id": 14, "name": "Traphouse Hook'rs", "wins": 3, "losses": 0, "pf": 295.76}, {"id": 15, "name": "Fartin' Mud", "wins": 0, "losses": 3, "pf": 292.78}, {"id": 16, "name": "Bofa Deez Nutz", "wins": 0, "losses": 3, "pf": 271.68}], "scores": {}, "recaps": {}, "roundRecaps": {}, "predictions": {}}</script>
 <script>
 (function(){
-  /* ============ CONFIG — edit this one line after you deploy the Worker ============ */
+  /* ============ CONFIG — lives in config.js, not here ============ */
+  const USER_CFG = window.BRACKET_CONFIG || {};
   const CFG = {
-    WORKER_URL: "https://fantasy-bracket.gbrennan14.workers.dev/",
-    SEED_THROUGH_WEEK: 7,
-    ROUND_PERIODS: [8, 9, 10, 11]
+    WORKER_URL: USER_CFG.WORKER_URL || "",
+    START_WEEK: USER_CFG.START_WEEK || 8
   };
+  CFG.SEED_THROUGH_WEEK = CFG.START_WEEK - 1;               // seeds lock on standings through this week
+  CFG.ROUND_PERIODS = [0, 1, 2, 3].map(i => CFG.START_WEEK + i);  // one round per week
+  CFG.IS_TEST = CFG.START_WEEK !== 8;
   /* ================================================================================== */
 
   const SNAPSHOT = JSON.parse(document.getElementById('league-data').textContent);
   const POS_ORDER = [1,16,8,9,5,12,4,13,3,14,6,11,7,10,2,15];
   const ROUND_LABELS = ["Round of 16","Quarterfinals","Semifinals","Final"];
-  const ROUND_WEEKS = ["Week 8","Week 9","Week 10","Week 11"];
-  const CACHE_KEY = 'midseason-last-sync';
+  const ROUND_WEEKS = CFG.ROUND_PERIODS.map(w => "Week " + w);
+  const CACHE_KEY = 'midseason-last-sync-w' + CFG.START_WEEK;
+  const SEEN_KEY = 'midseason-bracket-seen-w' + CFG.START_WEEK;
 
   let DATA = { ...SNAPSHOT, source: 'snapshot' };
   let SCORES = DATA.scores || {};
+  let LIVE = {};
   let SORTED = [], BRACKET = [];
   let PREDICTIONS = {}, PRED_OPEN = true;
   let syncMsg = '', syncMsgIsError = false;
@@ -498,7 +545,8 @@
     else if(teamA && teamB && sc[0] != null && sc[1] != null && sc[0] !== sc[1]){
       winner = sc[0] > sc[1] ? 'A' : 'B'; complete = true;
     }
-    return { winner, complete, scoreA: sc[0], scoreB: sc[1] };
+    const lv = (!complete && LIVE[id]) ? LIVE[id] : [null, null];
+    return { winner, complete, scoreA: sc[0], scoreB: sc[1], liveA: lv[0], liveB: lv[1] };
   }
   function round1(idx){
     const seedA = POS_ORDER[idx*2], seedB = POS_ORDER[idx*2+1];
@@ -515,7 +563,8 @@
     if(teamA && teamB && sc[0] != null && sc[1] != null && sc[0] !== sc[1]){
       winner = sc[0] > sc[1] ? 'A' : 'B'; complete = true;
     }
-    return { teamA, teamB, seedA, seedB, winner, complete, scoreA: sc[0], scoreB: sc[1] };
+    const lv = (!complete && teamA && teamB && LIVE[matchId(round, idx)]) ? LIVE[matchId(round, idx)] : [null, null];
+    return { teamA, teamB, seedA, seedB, winner, complete, scoreA: sc[0], scoreB: sc[1], liveA: lv[0], liveB: lv[1] };
   }
   function recompute(){
     SORTED = DATA.teams.map(t => ({...t})).sort((a, b) => b.wins - a.wins || a.losses - b.losses || b.pf - a.pf);
@@ -537,18 +586,28 @@
       return { id: t.id, name: t.name || `${t.location || ''} ${t.nickname || ''}`.trim() || `Team ${t.id}`,
                wins: o.wins || 0, losses: o.losses || 0, pf: o.pointsFor || 0 };
     });
-    const stats = {}, periodScores = {};
-    let sawSeedWeeks = false;
+    const stats = {}, periodScores = {}, livePeriod = {};
+    let sawSeedWeeks = false, asOf = 0;
     const pts = (side, p) => typeof side.totalPoints === 'number' ? side.totalPoints
       : (side.pointsByScoringPeriod && typeof side.pointsByScoringPeriod[p] === 'number') ? side.pointsByScoringPeriod[p] : null;
 
     (data.schedule || []).forEach(m => {
       const p = m.matchupPeriodId;
       const final = (m.winner && m.winner !== 'UNDECIDED') || cur > p;
-      if(!final) return;
       const sides = [m.home, m.away].filter(Boolean);
+      if(!final){
+        // In-progress week: keep the running score for display only (never decides a winner).
+        if(p === cur && CFG.ROUND_PERIODS.includes(p)){
+          livePeriod[p] = livePeriod[p] || {};
+          sides.forEach(s => {
+            const v = typeof s.livePoints === 'number' ? s.livePoints : pts(s, p);
+            if(v != null) livePeriod[p][s.teamId] = v;
+          });
+        }
+        return;
+      }
       if(p <= CFG.SEED_THROUGH_WEEK){
-        sawSeedWeeks = true;
+        sawSeedWeeks = true; asOf = Math.max(asOf, p);
         sides.forEach(s => {
           const st = stats[s.teamId] = stats[s.teamId] || { wins:0, losses:0, pf:0 };
           const v = pts(s, p); if(v != null) st.pf += v;
@@ -563,48 +622,63 @@
         sides.forEach(s => { const v = pts(s, p); if(v != null && v > 0) periodScores[p][s.teamId] = v; });
       }
     });
+    // Mulligans: swap deltas (bench points on, starter points off) adjust the round scores.
+    const mulligans = Array.isArray(data.mulligans) ? data.mulligans : [];
+    mulligans.forEach(sw => {
+      if(sw.status !== 'active' || typeof sw.delta !== 'number' || !CFG.ROUND_PERIODS.includes(sw.week)) return;
+      const ps = periodScores[sw.week], lp = livePeriod[sw.week];
+      if(ps && ps[sw.teamId] != null) ps[sw.teamId] = Math.round((ps[sw.teamId] + sw.delta) * 100) / 100;
+      if(lp && lp[sw.teamId] != null) lp[sw.teamId] = Math.round((lp[sw.teamId] + sw.delta) * 100) / 100;
+    });
     if(sawSeedWeeks){
       teams.forEach(t => { const st = stats[t.id]; if(st){ t.wins = st.wins; t.losses = st.losses; t.pf = Math.round(st.pf * 100) / 100; } });
     }
-    return { teams, periodScores,
-             asOfWeek: Math.max(0, Math.min(cur - 1, CFG.SEED_THROUGH_WEEK)),
-             seedsFinal: cur - 1 >= CFG.SEED_THROUGH_WEEK };
+    return { teams, periodScores, livePeriod, mulligans, mulligansEnabled: data.mulligansEnabled !== false,
+             asOfWeek: sawSeedWeeks ? asOf : Math.max(0, Math.min(cur - 1, CFG.SEED_THROUGH_WEEK)),
+             seedsFinal: (sawSeedWeeks ? asOf : cur - 1) >= CFG.SEED_THROUGH_WEEK };
   }
 
   // Each team's finalized weekly score goes to whatever bracket match that team is in, one round at a time.
-  function buildScores(periodScores){
-    const scores = {};
-    SCORES = scores;
+  function buildScores(periodScores, livePeriod){
+    const scores = {}, live = {};
+    SCORES = scores; LIVE = {};
     for(let r = 1; r <= 4; r++){
       recompute();
-      const ps = periodScores[CFG.ROUND_PERIODS[r-1]];
-      if(!ps) continue;
+      const period = CFG.ROUND_PERIODS[r-1];
+      const ps = periodScores[period], lp = (livePeriod || {})[period];
       BRACKET[r-1].forEach((m, i) => {
         if(!m.teamA || !m.teamB) return;
-        const a = ps[m.teamA.id], b = ps[m.teamB.id];
-        if(a != null && b != null) scores[matchId(r, i)] = [a, b];
+        const id = matchId(r, i);
+        if(ps && ps[m.teamA.id] != null && ps[m.teamB.id] != null){
+          scores[id] = [ps[m.teamA.id], ps[m.teamB.id]];
+        } else if(lp && lp[m.teamA.id] != null && lp[m.teamB.id] != null && (lp[m.teamA.id] > 0 || lp[m.teamB.id] > 0)){
+          live[id] = [lp[m.teamA.id], lp[m.teamB.id]];
+        }
       });
     }
-    return scores;
+    LIVE = live;
+    return { scores, live };
   }
 
   function applyParsed(parsed, source, updatedAt){
     DATA = { ...DATA, teams: parsed.teams, asOfWeek: parsed.asOfWeek, seedsFinal: parsed.seedsFinal,
+             mulligans: parsed.mulligans || [], mulligansEnabled: parsed.mulligansEnabled,
              updatedAt, source };
-    DATA.scores = buildScores(parsed.periodScores);
-    SCORES = DATA.scores;
+    const built = buildScores(parsed.periodScores, parsed.livePeriod);
+    DATA.scores = built.scores; DATA.live = built.live;
+    SCORES = DATA.scores; LIVE = DATA.live;
   }
 
   function saveCache(){
-    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ teams: DATA.teams, scores: DATA.scores,
-      asOfWeek: DATA.asOfWeek, seedsFinal: DATA.seedsFinal, updatedAt: DATA.updatedAt })); }catch(e){}
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ teams: DATA.teams, scores: DATA.scores, live: DATA.live || {},
+      asOfWeek: DATA.asOfWeek, seedsFinal: DATA.seedsFinal, mulligans: DATA.mulligans || [], mulligansEnabled: DATA.mulligansEnabled, updatedAt: DATA.updatedAt })); }catch(e){}
   }
   function loadCache(){
     try{
       const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
       if(c && Array.isArray(c.teams) && c.teams.length === 14 && (!SNAPSHOT.updatedAt || c.updatedAt > SNAPSHOT.updatedAt)){
         DATA = { ...DATA, ...c, source: 'cached' };
-        SCORES = DATA.scores || {};
+        SCORES = DATA.scores || {}; LIVE = DATA.live || {};
       }
     }catch(e){}
   }
@@ -626,7 +700,7 @@
     }catch(err){
       syncMsg = (err && err.name === 'TypeError') ? "Couldn't reach the sync service. Showing the last saved scores." : (err.message || 'Sync failed.') + ' Showing the last saved scores.';
       syncMsgIsError = true;
-      SCORES = DATA.scores || {};
+      SCORES = DATA.scores || {}; LIVE = DATA.live || {};
     }finally{
       btn.disabled = false;
       renderAll();
@@ -638,8 +712,9 @@
     const when = DATA.updatedAt ? new Date(DATA.updatedAt).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : '';
     const src = DATA.source === 'live' ? 'live from ESPN' : DATA.source === 'cached' ? 'saved copy' : 'starting snapshot';
     const pill = DATA.seedsFinal ? 'Seeds locked' : 'Provisional seeds';
-    const tail = DATA.seedsFinal ? '' : ' · final seeds lock after Week 7';
-    let html = `<span class="pill">${pill}</span>Standings through Week ${esc(DATA.asOfWeek)}${tail} · ${src}${when ? ' · ' + esc(when) : ''}`;
+    const tail = DATA.seedsFinal ? '' : ` · final seeds lock after Week ${CFG.SEED_THROUGH_WEEK}`;
+    const anyLive = Object.keys(LIVE).length > 0;
+    let html = `<span class="pill">${pill}</span>Standings through Week ${esc(DATA.asOfWeek)}${tail} · ${src}${when ? ' · ' + esc(when) : ''}${anyLive ? ' · <strong>games in progress — scores are not final</strong>' : ''}`;
     if(syncMsg) html += `<br><span style="color:${syncMsgIsError ? 'var(--alert)' : 'var(--text-dim)'}">${esc(syncMsg)}</span>`;
     $('statusBar').innerHTML = html;
   }
@@ -662,21 +737,23 @@
     });
   }
 
-  function teamRow(m, side, isBye){
+  function teamRow(m, side, isBye, rIdx){
     const team = side === 'A' ? m.teamA : m.teamB;
     const seed = side === 'A' ? m.seedA : m.seedB;
-    const score = side === 'A' ? m.scoreA : m.scoreB;
+    const isLive = !m.complete && m.liveA != null && m.liveB != null;
+    const score = isLive ? (side === 'A' ? m.liveA : m.liveB) : (side === 'A' ? m.scoreA : m.scoreB);
+    const leading = isLive && (side === 'A' ? m.liveA > m.liveB : m.liveB > m.liveA);
     const row = document.createElement('div');
     let cls = 'team-row';
     if(!team) cls += ' tbd';
     if(m.complete && team) cls += (m.winner === side) ? ' winner' : ' eliminated';
     row.className = cls;
     const left = team
-      ? `${avatarHtml(team)}<span class="team-seed">${seed ?? ''}</span><span class="team-name">${esc(team.name)}</span>`
+      ? `${avatarHtml(team)}<span class="team-seed">${seed ?? ''}</span><span class="team-name">${esc(team.name)}</span>${mullGlyph(team.id, rIdx)}`
       : `<span class="team-name">TBD</span>`;
     let right = '';
     if(team && isBye) right = `<span class="bye-tag">BYE</span>`;
-    else if(team) right = `<span class="team-score">${score != null ? Number(score).toFixed(2) : '–'}</span>`;
+    else if(team) right = `<span class="team-score${isLive ? ' live' : ''}${leading ? ' lead' : ''}">${score != null ? Number(score).toFixed(2) : '–'}</span>`;
     row.innerHTML = `<div class="team-left">${left}</div>${right}`;
     return row;
   }
@@ -693,8 +770,8 @@
       setTimeout(() => p.remove(), 1400);
     }
   }
-  function loadSeen(){ try{ const r = localStorage.getItem('midseason-bracket-seen'); return r ? new Set(JSON.parse(r)) : null; }catch(e){ return null; } }
-  function saveSeen(set){ try{ localStorage.setItem('midseason-bracket-seen', JSON.stringify([...set])); }catch(e){} }
+  function loadSeen(){ try{ const r = localStorage.getItem(SEEN_KEY); return r ? new Set(JSON.parse(r)) : null; }catch(e){ return null; } }
+  function saveSeen(set){ try{ localStorage.setItem(SEEN_KEY, JSON.stringify([...set])); }catch(e){} }
 
   function renderBracket(){
     const el = $('bracketEl');
@@ -725,16 +802,18 @@
         const real = m.complete && m.teamA && m.teamB;
         if(real){ current.add(id); if(seen && !seen.has(id)) fresh.push(div); }
         const isUpset = real && ((m.winner === 'A' && m.seedA > m.seedB) || (m.winner === 'B' && m.seedB > m.seedA));
-        if(isUpset || mIdx === blowoutIdx || mIdx === nailIdx){
+        const isLive = !m.complete && m.liveA != null && m.liveB != null;
+        if(isUpset || isLive || mIdx === blowoutIdx || mIdx === nailIdx){
           const br = document.createElement('div');
           br.className = 'badge-row';
+          if(isLive) br.innerHTML += `<span class="tag tag-live"><span class="live-dot"></span>Live — not final</span>`;
           if(isUpset) br.innerHTML += `<span class="tag tag-upset">🚨 Upset</span>`;
           if(mIdx === blowoutIdx) br.innerHTML += `<span class="tag tag-blowout">🔥 Blowout of the round</span>`;
           if(mIdx === nailIdx) br.innerHTML += `<span class="tag tag-nailbiter">😬 Nail-biter of the round</span>`;
           div.appendChild(br);
         }
-        div.appendChild(teamRow(m, 'A', isBye));
-        div.appendChild(teamRow(m, 'B', isBye));
+        div.appendChild(teamRow(m, 'A', isBye, rIdx));
+        div.appendChild(teamRow(m, 'B', isBye, rIdx));
         if(real){
           const r = document.createElement('div');
           r.className = 'recap';
@@ -811,7 +890,7 @@
 
   function setupPredictions(){
     $('predictIntro').innerHTML = PRED_OPEN
-      ? `Pick a full bracket before Week 8 kicks off. Picks are by <strong>seed number</strong>, so they still count if seeds shuffle before Week 7 ends. When you're done, tap <em>Get my picks code</em> and send the code to the commissioner to get on the leaderboard.`
+      ? `Pick a full bracket before Week ${CFG.START_WEEK} kicks off. Picks are by <strong>seed number</strong>, so they still count if seeds shuffle before Week ${CFG.SEED_THROUGH_WEEK} ends. When you're done, tap <em>Get my picks code</em> and send the code to the commissioner to get on the leaderboard.`
       : `Picks are locked — the tournament has started. Here's how everyone's bracket is holding up.`;
     $('predictForm').style.display = PRED_OPEN ? '' : 'none';
     if(listenersBound) return;
@@ -888,20 +967,170 @@
     el.textContent = `⏱ Next kickoff in ${d}d ${h}h ${m}m ${s}s (approx., your local time)`;
   }
 
+  /* ---------- mulligans ---------- */
+  const MULL = { teamId: null, view: null, outId: '', inId: '', msg: '', err: false, busy: false, loading: false, teamSig: '' };
+  const workerBase = () => (CFG.WORKER_URL && CFG.WORKER_URL.indexOf('PASTE_YOUR') !== 0) ? CFG.WORKER_URL.replace(/\/+$/, '') : '';
+  const activeSwaps = () => (DATA.mulligans || []).filter(s => s.status === 'active');
+  const swapFor = (teamId, week) => activeSwaps().find(s => s.teamId === teamId && s.week === week) || null;
+  const teamNameById = id => { const t = DATA.teams.find(x => x.id === id); return t ? t.name : 'Team ' + id; };
+  const f2 = n => Number(n).toFixed(2);
+  const signed = n => (n > 0 ? '+' : '') + f2(n);
+
+  function mullGlyph(teamId, rIdx){
+    if(rIdx == null) return '';
+    const sw = swapFor(teamId, CFG.ROUND_PERIODS[rIdx]);
+    return sw ? `<span class="mull-glyph" title="${esc('Mulligan: ' + sw.out.name + ' out, ' + sw.in.name + ' in')}">↺</span>` : '';
+  }
+
+  async function mullRequest(path, opts){
+    const res = await fetch(workerBase() + path, { cache: 'no-store', ...(opts || {}) });
+    let json = null;
+    try{ json = await res.json(); }catch(e){}
+    if(!res.ok) throw new Error((json && json.error) || `Service returned HTTP ${res.status}`);
+    return json;
+  }
+
+  async function loadMullRoster(keepMsg){
+    MULL.view = null; MULL.outId = ''; MULL.inId = '';
+    if(!keepMsg){ MULL.msg = ''; MULL.err = false; }
+    const asked = MULL.teamId;
+    if(!asked){ renderMullPanel(); return; }
+    MULL.loading = true; renderMullPanel();
+    try{
+      const v = await mullRequest('/roster?team=' + asked);
+      if(MULL.teamId !== asked) return;
+      MULL.view = v;
+    }catch(e){
+      if(MULL.teamId !== asked) return;
+      MULL.msg = (e && e.name === 'TypeError') ? "Couldn't reach the service." : e.message; MULL.err = true;
+    }
+    MULL.loading = false; renderMullPanel();
+  }
+
+  function renderMullPanel(){
+    const el = $('mullPanel');
+    if(!MULL.teamId){ el.innerHTML = ''; return; }
+    if(MULL.loading){ el.innerHTML = '<p class="mull-note">Loading lineup…</p>'; return; }
+    const v = MULL.view;
+    let html = '';
+    if(v){
+      if(!CFG.ROUND_PERIODS.includes(v.week)){
+        html = `<p class="mull-note">Mulligans open during tournament weeks (Week ${CFG.ROUND_PERIODS[0]} to Week ${CFG.ROUND_PERIODS[3]}). ESPN is on Week ${esc(v.week)} right now.</p>`;
+      }else if(v.used){
+        html = `<p class="mull-note">${esc(teamNameById(v.teamId))} already used this round's mulligan: ${esc(v.used.out.name)} out, ${esc(v.used.in.name)} in.</p>`;
+      }else{
+        const outs = v.starters.filter(p => p.started && (v.options[p.id] || []).length);
+        if(!outs.length){
+          html = `<p class="mull-note">Nothing to swap right now. You need a starter whose game has kicked off and a bench player (who can fill that spot) whose game hasn't.</p>`;
+        }else{
+          const outP = outs.find(p => String(p.id) === MULL.outId) || null;
+          const ins = outP ? v.bench.filter(b => (v.options[outP.id] || []).includes(b.id)) : [];
+          const inP = ins.find(b => String(b.id) === MULL.inId) || null;
+          html = `<div class="mull-grid">
+            <div><label for="mullOut">Starter who already played</label>
+              <select id="mullOut"><option value="">Choose…</option>${outs.map(p => `<option value="${p.id}"${outP && p.id === outP.id ? ' selected' : ''}>${esc(p.name)} — ${f2(p.pts)}</option>`).join('')}</select></div>
+            <div><label for="mullIn">Bench player who hasn't played</label>
+              <select id="mullIn"${outP ? '' : ' disabled'}><option value="">Choose…</option>${ins.map(b => `<option value="${b.id}"${inP && b.id === inP.id ? ' selected' : ''}>${esc(b.name)}</option>`).join('')}</select></div>
+          </div>`;
+          if(outP && inP){
+            html += `<div class="mull-preview">${esc(outP.name)}'s ${f2(outP.pts)} come off. ${esc(inP.name)}'s points count instead, whatever he scores. One mulligan per round, and it can't be undone (only the commissioner can void it).</div>
+              <div class="mull-controls"><button class="primary" id="mullGo"${MULL.busy ? ' disabled' : ''}>${MULL.busy ? 'Locking in…' : 'Lock in mulligan'}</button></div>`;
+          }
+        }
+      }
+    }
+    if(MULL.msg) html += `<p class="mull-note${MULL.err ? ' err' : ''}">${esc(MULL.msg)}</p>`;
+    el.innerHTML = html;
+  }
+
+  async function submitMull(){
+    if(MULL.busy) return;
+    MULL.busy = true; MULL.msg = ''; renderMullPanel();
+    try{
+      await mullRequest('/mulligan', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teamId: MULL.teamId, outId: Number(MULL.outId), inId: Number(MULL.inId) }) });
+      MULL.busy = false;
+      await sync();
+      MULL.msg = 'Mulligan locked in.'; MULL.err = false;
+      await loadMullRoster(true);
+    }catch(e){
+      MULL.busy = false;
+      MULL.msg = (e && e.name === 'TypeError') ? "Couldn't reach the service." : e.message; MULL.err = true;
+      renderMullPanel();
+    }
+  }
+
+  async function voidSwap(id){
+    const key = $('mullKey').value;
+    if(!key) return;
+    try{
+      await mullRequest('/void', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, key }) });
+      await sync();
+      if(MULL.teamId) loadMullRoster();
+    }catch(e){
+      alert((e && e.name === 'TypeError') ? "Couldn't reach the service." : e.message);
+    }
+  }
+
+  function renderMulligan(){
+    const base = workerBase();
+    const off = !base || DATA.mulligansEnabled === false;
+    $('mullIntro').textContent = off
+      ? "Mulligans aren't switched on yet."
+      : "One mulligan per team per round. Swap a starter who has already played for a bench player who hasn't kicked off yet: the starter's points come off and the bench player's points count. Locks follow NFL kickoff times. Every swap is logged below for everyone to see.";
+    const sel = $('mullTeam');
+    const sig = SORTED.map(t => t.id + ':' + t.name).join('|') + (off ? '|off' : '');
+    if(sig !== MULL.teamSig){
+      MULL.teamSig = sig;
+      sel.innerHTML = '<option value="">Choose your team…</option>' +
+        [...DATA.teams].sort((a, b) => a.name.localeCompare(b.name)).map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
+      sel.value = MULL.teamId ? String(MULL.teamId) : '';
+    }
+    sel.disabled = off;
+    $('mullPanel').style.display = off ? 'none' : '';
+    const list = [...(DATA.mulligans || [])].sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    $('mullLog').innerHTML = list.length ? list.map(s => {
+      const eff = s.status === 'active' ? (typeof s.delta === 'number' ? ` · score effect ${signed(s.delta)}` : ' · score effect pending') : ' · voided';
+      return `<div class="mull-log-row${s.status === 'void' ? ' void' : ''}"><span class="when">Week ${esc(s.week)} · ${esc(new Date(s.at).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}))}</span>
+        <strong>${esc(teamNameById(s.teamId))}</strong>: ${esc(s.out.name)} ↺ ${esc(s.in.name)}${eff}</div>`;
+    }).join('') : (off ? '' : '<p class="mull-note">No mulligans used yet.</p>');
+    const act = activeSwaps();
+    $('mullAdminList').innerHTML = act.length ? act.map(s =>
+      `<div class="mull-log-row">${esc(teamNameById(s.teamId))} (Wk ${esc(s.week)}): ${esc(s.out.name)} ↺ ${esc(s.in.name)} <button data-void="${esc(s.id)}">Void</button></div>`).join('')
+      : '<p class="mull-note">Nothing to void.</p>';
+  }
+
+  function bindMulligan(){
+    $('mullTeam').addEventListener('change', e => { MULL.teamId = e.target.value ? Number(e.target.value) : null; loadMullRoster(); });
+    $('mullPanel').addEventListener('change', e => {
+      if(e.target.id === 'mullOut'){ MULL.outId = e.target.value; MULL.inId = ''; renderMullPanel(); }
+      else if(e.target.id === 'mullIn'){ MULL.inId = e.target.value; renderMullPanel(); }
+    });
+    $('mullPanel').addEventListener('click', e => { if(e.target.id === 'mullGo') submitMull(); });
+    $('mullAdminList').addEventListener('click', e => { const id = e.target && e.target.getAttribute && e.target.getAttribute('data-void'); if(id) voidSwap(id); });
+  }
+
   function renderAll(){
     recompute();
     renderStatus();
     renderRoster();
     renderBracket();
+    renderMulligan();
     setupPredictions();
     renderPicker();
     renderLeaderboard();
   }
 
   $('footnote').innerHTML =
-    `Seeds come from the standings above (record, ties broken by points for) and lock after Week 7. Seeds 15 &amp; 16 are byes, so Seeds 1 and 2 skip straight to the quarterfinals. ` +
+    `Seeds come from the standings above (record, ties broken by points for) and lock after Week ${CFG.SEED_THROUGH_WEEK}. Seeds 15 &amp; 16 are byes, so Seeds 1 and 2 skip straight to the quarterfinals. ` +
     `Weekly scores are each team's finalized ESPN score for that week, regardless of who they played in the regular league schedule.`;
+  $('subLine').textContent = `14 teams · single elimination · weeks ${CFG.ROUND_PERIODS[0]} → ${CFG.ROUND_PERIODS[3]}`;
+  if(CFG.IS_TEST){
+    const eb = document.querySelector('.eyebrow');
+    eb.textContent = 'TEST RUN · ' + eb.textContent;
+  }
   $('syncBtn').addEventListener('click', sync);
+  bindMulligan();
 
   loadCache();
   renderAll();
