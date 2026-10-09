@@ -443,6 +443,8 @@
   const CACHE_KEY = 'midseason-last-sync-w' + CFG.START_WEEK;
   const SEEN_KEY = 'midseason-bracket-seen-w' + CFG.START_WEEK;
 
+  let LIVE_TICK = 0;
+  try{ LIVE_TICK = parseInt(localStorage.getItem('midseason-roast-tick') || '0', 10) || 0; }catch(e){}
   let DATA = { ...SNAPSHOT, source: 'snapshot' };
   let SCORES = DATA.scores || {};
   let LIVE = {};
@@ -490,6 +492,211 @@
       "If you're still alive, enjoy it. The bracket isn't done humiliating people."
     ]
   };
+  const LIVE_ROAST = {
+ "close": [
+  "{l} is down just {m}, which is the closest they'll ever get to being competitive.",
+  "{l} trails by {m}. Swap a player? Pray? Delete the app? All equally useful.",
+  "Only {m} behind, and {l} is already drafting the excuse about the refs.",
+  "{l} is losing by {m}, which for them counts as a strong showing.",
+  "{w} is up {m}. {l} could still win if literally everything goes right, which has never once happened to {l}.",
+  "It's {ws} to {ls}. {l} is one bad drive away from crying into a bag of chips.",
+  "{l} is within {m}, and still acting like a 4-point lead for {w} is a coincidence.",
+  "{l} trails by {m} and is refreshing the app like it owes them money.",
+  "A {m}-point deficit. {l} is one decent play away from not being embarrassed. Don't count on it.",
+  "{l} is hanging in there at {ls}, like a dog watching a car drive away.",
+  "{w} leads by {m}. {l} set this lineup like they were guessing the lottery numbers.",
+  "{l} is only down {m} and somehow still looks like they're losing by fifty.",
+  "{l}'s hopes are alive, mostly because {w} hasn't finished embarrassing them yet.",
+  "{ls} to {ws}. {l} is playing this close the way a dying phone stays at 1%.",
+  "{l} trails by {m}, and every start/sit decision is coming home to roost.",
+  "{l} is within striking distance. Unfortunately, {l} is also the one doing the striking.",
+  "Down {m}. {l} keeps saying it's not over, the way people say it before it's over.",
+  "{l} is so close and still so far, like their entire fantasy career.",
+  "{w} is up {m} and {l} still hasn't figured out which button sets the lineup.",
+  "{l} is behind by {m}. That bench is looking mighty smart right about now. Oh wait, it's not.",
+  "It's tight, but {l} is on the wrong side of it, which is where {l} lives.",
+  "{l} trails by a measly {m} and is about to find a creative way to lose anyway.",
+  "{l} is down {m}. A few bad bounces and they might actually lose this one. Wait, they already are.",
+  "{l} is still in this, in the same way a sinking ship is still technically a boat.",
+  "{w} leads {ws} to {ls}. {l} should start preparing the apology to the group chat.",
+  "{l} is within {m} and still sweating like they're explaining a trade to the commissioner.",
+  "Down only {m}, and {l} is already blaming the kicker. Classic.",
+  "{l} is trailing by {m} and relying on a miracle. The miracle declined the invite.",
+  "{l} could still win this. People also could still win the lottery.",
+  "{l} is losing by {m}, which is somehow worse than losing by a lot. Every missed point has a name.",
+  "{l} is behind {m} and the only thing running hot is their panic.",
+  "{w} is ahead by {m}, which is all they need to keep rent-free space in {l}'s head.",
+  "That {m}-point gap is the distance between {l} and a shred of dignity.",
+  "{l} is chasing {w} like a toddler chasing a bus.",
+  "{l} trails by {m}. Somewhere, a bench player is scoring 20 and {l} has to live with it.",
+  "{l} is down {m}, and a coin flip would have set a better lineup.",
+  "{l} still has a pulse at {ls}. Barely. Check again in an hour.",
+  "{l} is down {m}. Maybe next time try reading the injury report instead of vibes.",
+  "{w} is up {m}. {l} is clinging on like a guy who got a free trial for hope.",
+  "{l} is behind {m} and having the kind of day that gets a fantasy manager a lecture from their spouse.",
+  "{ls} to {ws}. {l} wanted to be competitive. They are, in the same way a spilled drink is competitive with a floor.",
+  "{l} trails by {m} and the doubt is eating them alive. Good.",
+  "{l} is one big play from a comeback and one long Sunday from a meltdown.",
+  "{l} is down {m}, and honestly the lineup looked rough before the games even started.",
+  "{w} leads by {m}. {l} is losing the way they do everything: slowly and with a lot of confidence.",
+  "{l} is only {m} down and has already written the \"I got unlucky\" speech.",
+  "This is as close as {l} will get to winning. Enjoy it.",
+  "{l} trails by {m} and every roster move they made is now a crime scene.",
+  "{l} is down {m} and looking up at {w} like a golden retriever at a ceiling fan.",
+  "{l} is losing this by {m}, and there is no one to blame but the person in the mirror.",
+  "{l} is in a dogfight, except the dog is {w} and {l} is the squeaky toy.",
+  "{l} trails by {m}. Hope is a hell of a drug, and {l} is on a heavy dose.",
+  "It's {ws} to {ls} and {l} is making the exact face you'd expect.",
+  "A {m}-point gap. {l} is close enough to smell victory and far enough to smell their own roster.",
+  "{l} is down {m} and the group chat is about to find out.",
+  "{l} is within a touchdown and still refusing to admit the bench cost them.",
+  "{l} trails by {m}, which is the fantasy equivalent of getting a participation trophy before the game ends.",
+  "{w} is up {m} and {l} is doing math with a calculator that only says \"no.\"",
+  "{l} is so close to winning that losing will feel extra personal. Good luck with that."
+ ],
+ "behind": [
+  "{l} is down {m} and falling. That lineup should come with a warning label.",
+  "{ws} to {ls}. {l} is getting out-scored like they forgot to show up to their own game.",
+  "{l} trails by {m}. This is what happens when you set your lineup based on a dream you had.",
+  "{w} is up {m} and {l} is wondering where it all went wrong. Start with the QB.",
+  "{l} is down {m} and looking more lost than a tourist in a corn maze.",
+  "{l} has {ls} points. That's not a lineup, that's a cry for help.",
+  "{w} leads by {m}. {l} should consider throwing the whole roster in the trash and starting fresh.",
+  "{l} is losing by {m} and every player they started is currently doing a bad impression of a pylon.",
+  "{l} is getting beat by {m}. At this point their bench has better odds than the starters.",
+  "{l} is down {m}, and the only thing {l} has on their side is the delusion of a comeback.",
+  "{l}'s starters are playing like they got the lineup memo in the mail.",
+  "{l} trails by {m}. Their best player is currently whatever makes the least embarrassing noise.",
+  "{l} is down {m}. The waiver wire is laughing, and honestly the waiver wire has a point.",
+  "{ls} points. {l} could have scored more by leaving the lineup empty and going to bed.",
+  "{w} is up {m}. {l} is a customer in someone else's victory lap.",
+  "{l} is losing by {m} and has the offensive output of a vending machine that's out of stock.",
+  "It's {ws} to {ls}. {l} is proof that confidence and talent are two different things.",
+  "{l} is behind by {m}, and no one is surprised, least of all {l}'s own roster.",
+  "{l} is down {m}. Their running backs are running in circles and their receivers can't find the ball.",
+  "{w} leads by {m}. {l} set this lineup like they were wearing a blindfold in a tornado.",
+  "{l} is losing by {m}. Even their kicker is considering a career change.",
+  "{l} trails by {m} and the draft strategy is looking like a bad joke without a punchline.",
+  "{l} is down {m} and playing for pride, which isn't scoring any points either.",
+  "{w} is ahead by {m}. {l} should check whether their players are even awake.",
+  "{l} has {ls}. That's the sort of number you put up when you don't try, except they did try.",
+  "{l} is down {m} and the only thing climbing is the blood pressure.",
+  "{l} is losing by {m} and has a bench full of players who would have scored. Thanks for that, genius.",
+  "{ls} to {ws}. {l} is the participation ribbon of this matchup.",
+  "{l} trails by {m}. Their team has the energy of a Monday morning meeting.",
+  "{l} is down {m}. If they lose, they have no one to blame but the two hours they spent on this lineup.",
+  "{l} is down {m}, and {w} didn't even need to try.",
+  "{l} trails by {m} and keeps checking the score like it's going to change out of pity.",
+  "{w} is up {m}. {l} is taking an L in public and the whole league can watch.",
+  "{l} is behind by {m}. Not even a trade deadline deal could save this mess.",
+  "{l}'s lineup is down {m} and playing like it's mad at its owner. Honestly, fair.",
+  "{l} is down {m} and bleeding points faster than a crime scene.",
+  "{l} is trailing by {m}, and every notification they get makes it worse.",
+  "The {ls} points {l} has so far could be beaten by a decent high school team.",
+  "{l} is down {m} and the group chat is already drafting the roast.",
+  "{w} leads {ws} to {ls}. {l} is just a guy who showed up to a gunfight with a sandwich.",
+  "{l} is losing by {m} and has the flair of a team that's never won anything, because they haven't.",
+  "{l} is down {m}. Maybe the real draft pick was the friends we made. And the points we didn't.",
+  "{l} trails by {m} and at this point should just forfeit and save everyone the suspense.",
+  "{l} is down {m}, and the lineup looked bad on paper. On the field it looks worse.",
+  "{l} is behind by {m}. If incompetence were a stat, they'd be leading the league.",
+  "{w} is up {m} and {l} is taking notes on how not to win.",
+  "{l} is down {m}. The only thing in their lineup scoring on time is the disappointment.",
+  "{l} has {ls} points, which is not a score, it's a cry for sympathy.",
+  "{l} trails by {m} and the sound you hear is a manager muttering \"I should have started the other guy.\"",
+  "{l} is down {m}. Their roster is a witness protection program for bad decisions.",
+  "{ws} to {ls}. {l} brought a knife to a gun fight and then forgot the knife.",
+  "{l} is down {m}, and this is the part of the movie where they realize they're the extra.",
+  "{l} trails by {m}. Every point {w} scores is another nail in the coffin of {l}'s season.",
+  "{l} is down {m} and officially in the \"blame the kicker\" stage of grief.",
+  "{l} is losing by {m}. They can still cut the damage if they stop looking at the screen and start praying.",
+  "{w} leads by {m}. {l} is a tragedy in a hoodie.",
+  "{l} is down {m}. The only thing scoring for them right now is the sympathy of strangers.",
+  "{l} trails by {m}. Their best chance of winning is a clerical error and even the clerk gave up.",
+  "{l} is down {m}. They drafted this team, so the call is coming from inside the house.",
+  "{l} is behind by {m} and this is just the start of the Sunday spiral.",
+  "{l} is down {m} and coping harder than a guy at a wedding where his ex is the DJ.",
+  "{ls} points. {l} is putting up numbers like they're afraid of the scoreboard.",
+  "{l} is getting outscored by {m}. A fantasy football manager's greatest fear is being average, and {l} is not even reaching average.",
+  "{w} is up {m}. {l} should consider witness protection from their own roster.",
+  "{l} is down {m} and watching the game through their fingers.",
+  "{l} trails by {m}. It's the kind of deficit that makes you question whether you've ever known a single thing about football.",
+  "{l} is down {m}, and the lineup is starting to look like a ransom note.",
+  "{l} is losing by {m}, and the best thing in their lineup is the injury designation.",
+  "{l} is down {m}. Their roster looks like it was picked by someone who hates them.",
+  "{l} trails by {m}, and somewhere an auto-draft bot is laughing and doing it better.",
+  "{w} is up {m}. {l} has all the firepower of a wet noodle."
+ ],
+ "crush": [
+  "{ws} to {ls}. {l} is getting folded like a lawn chair.",
+  "{w} is up by {m}. Someone get {l} a blanket and a grief counselor.",
+  "{l} is down {m}. The comeback isn't happening. Call it. Cancel it. Bury it.",
+  "{l} trails by {m} and the lineup should be investigated by a medical professional.",
+  "{l} is down {m}, and the only thing keeping them in the game is the commissioner's pity.",
+  "{l} has {ls} points. I've seen better results from a broken calculator.",
+  "{w} is ahead by {m}. {l} should hit the \"forfeit\" button of life.",
+  "{l} is losing by {m} and has the scoring prowess of a parking garage.",
+  "{l} is down {m}. They're not losing, they're being used as a case study.",
+  "{l} trails by {m}, and the draft day optimism is now a documented historical embarrassment.",
+  "{w} leads by {m}. {l} has the competitive spirit of a deflated pool toy.",
+  "{l} is down {m}. This isn't a matchup, it's a hostage video.",
+  "{l} is getting destroyed by {m}. Somewhere, a bench player is crying for being left out of this nightmare.",
+  "{l} is down {m}. The playoffs are a cruel joke they weren't invited to.",
+  "{l} is down {m} and every one of their starters should be sent to the principal's office.",
+  "{l} trails by {m}. They could have set that lineup with a dartboard and done better.",
+  "{l} is down {m}. This is a car crash and everyone's slowing down to watch.",
+  "{l} is down {m}. Even the participation trophy is embarrassed to be associated with them.",
+  "{w} is up {m}. {l} is the sound of a trombone playing sad notes.",
+  "{l} is losing by {m}. The group chat has already screenshotted this for the hall of shame.",
+  "{l} is down {m}. It's less \"tough loss\" and more \"crime scene.\"",
+  "{l} is losing by {m} and their lineup has the pulse of a houseplant.",
+  "{l} trails by {m}. At this point the best move is to unplug the router.",
+  "{l} is down {m}. They are the human equivalent of a participation ribbon in the shape of a bruise.",
+  "{ws} to {ls}. {l} just got taken to the cleaners, and the cleaners didn't even need to work hard.",
+  "{l} is down {m}. This is the lineup of a person who sets their lineup in the dark, in a hurry, while drunk.",
+  "{l} is down {m} and still insisting there's time. There isn't. There never was.",
+  "{w} leads by {m}. {l} should check if their team is still a team or just a group of strangers.",
+  "{l} is down {m} and the only thing they've mastered is the art of being bad.",
+  "{l} is losing by {m}. The scoreboard is just rubbing it in at this point.",
+  "{l} is down {m}. Their offense couldn't score in a room full of defenseless puppies.",
+  "{l} trails by {m} and the draft class of this team will be taught in schools as a warning.",
+  "{w} is up {m}. {l} is a case study in how not to run a team.",
+  "{l} is down {m}, and the only thing worse than this score is the lineup that produced it.",
+  "{l} has {ls} points and a record-setting deficit. At least they're achieving something.",
+  "{l} is down {m}. Their season is a long, slow, public apology.",
+  "{l} is down {m}, and honestly the best strategy now is to delete the app and move to another country.",
+  "{l} trails by {m}. This is the kind of loss that gets mentioned at your funeral.",
+  "{w} is ahead by {m} and {l} is just here for the humiliation.",
+  "{l} is getting rocked by {m}. Time to update the resume, because the managing career is over.",
+  "{l} is down {m}. Even their bench gave up on them.",
+  "{l} is down {m} and playing like the lineup was auto-generated by a drunk raccoon.",
+  "{l} is down {m}. A hole this deep requires a shovel and a priest.",
+  "{l} is down {m}. The offensive line is a rumor and the quarterback is a myth.",
+  "{l} is losing by {m}. A better team could be assembled from the first five people in the grocery store.",
+  "{l} is down {m}. Their roster has the structural integrity of a sandcastle at high tide.",
+  "{l} is down {m}. {w} is playing fantasy football and {l} is playing fantasy hide and seek.",
+  "{l} trails by {m}. They've got the firepower of a butter knife in a swordfight.",
+  "{l} is down {m}, and the only thing under control is their rapidly dwindling dignity.",
+  "{l} is down {m}. At this point their only play is a prayer, and God's on {w}'s side.",
+  "{l} is down {m} and has scored like the lineup was written in disappearing ink.",
+  "{l} is down {m}. This is the type of beating that gets framed in the other guy's office.",
+  "{ws} to {ls}. {l} is the opening act for {w}'s victory parade.",
+  "{l} is down {m}. Their stud players are acting like duds and their duds are acting like corpses.",
+  "{l} is losing by {m}. If this were a boxing match, they'd have stopped it three rounds ago.",
+  "{l} is down {m}. Somebody turn off the lights, the party's over.",
+  "{w} is up {m}. {l} is getting taught a lesson in humility the hard way.",
+  "{l} is down {m} and has the look of a team that peaked in the preseason.",
+  "{l} is down {m}. It's like watching a slow-motion train wreck in a very expensive suit.",
+  "{l} is down {m}. The most productive thing {l} has done all week is complain.",
+  "{l} is down {m}. Their team's identity is \"participation.\"",
+  "{l} trails by {m}. A mercy rule isn't coming, but it should have.",
+  "{l} is down {m}. The lineup is a graveyard and the QB is the gravedigger.",
+  "{l} is down {m}, and honestly the best part of their team is the logo.",
+  "{l} is down {m}. Their fans are leaving early and so is the luck.",
+  "{w} wins this by a mile at {ws}. {l} is looking at {ls} like it's a typo.",
+  "{l} is down {m}. A season of hope is being erased in real time."
+ ]
+};
   const hash = s => { let h = 0; for(const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
   const pickFrom = (arr, key) => arr[hash(key) % arr.length];
   const fill = (t, v) => t.replace(/\{(\w+)\}/g, (_, k) => v[k]);
@@ -664,6 +871,7 @@
     DATA = { ...DATA, teams: parsed.teams, asOfWeek: parsed.asOfWeek, seedsFinal: parsed.seedsFinal,
              mulligans: parsed.mulligans || [], mulligansEnabled: parsed.mulligansEnabled,
              updatedAt, source };
+    if(source === 'live'){ LIVE_TICK++; try{ localStorage.setItem('midseason-roast-tick', String(LIVE_TICK)); }catch(e){} }
     const built = buildScores(parsed.periodScores, parsed.livePeriod);
     DATA.scores = built.scores; DATA.live = built.live;
     SCORES = DATA.scores; LIVE = DATA.live;
@@ -814,6 +1022,19 @@
         }
         div.appendChild(teamRow(m, 'A', isBye, rIdx));
         div.appendChild(teamRow(m, 'B', isBye, rIdx));
+        if(isLive && m.teamA && m.teamB && m.liveA !== m.liveB){
+          const aLeads = m.liveA > m.liveB;
+          const lose = aLeads ? m.teamB : m.teamA, win = aLeads ? m.teamA : m.teamB;
+          const ls = aLeads ? m.liveB : m.liveA, ws = aLeads ? m.liveA : m.liveB;
+          const margin = ws - ls;
+          const tier = margin < 15 ? 'close' : margin < 50 ? 'behind' : 'crush';
+          const bank = LIVE_ROAST[tier];
+          const rr = document.createElement('div');
+          rr.className = 'recap live-roast';
+          rr.textContent = '🔥 LIVE: ' + fill(bank[(hash(id) + LIVE_TICK) % bank.length],
+            { l: lose.name, w: win.name, m: margin.toFixed(2), ls: ls.toFixed(2), ws: ws.toFixed(2) });
+          div.appendChild(rr);
+        }
         if(real){
           const r = document.createElement('div');
           r.className = 'recap';
