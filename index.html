@@ -869,7 +869,7 @@
 
   function applyParsed(parsed, source, updatedAt){
     DATA = { ...DATA, teams: parsed.teams, asOfWeek: parsed.asOfWeek, seedsFinal: parsed.seedsFinal,
-             mulligans: parsed.mulligans || [], mulligansEnabled: parsed.mulligansEnabled,
+             mulligans: (parsed.mulligans || []).filter(m => CFG.ROUND_PERIODS.includes(m.week)), mulligansEnabled: parsed.mulligansEnabled,
              updatedAt, source };
     if(source === 'live'){ LIVE_TICK++; try{ localStorage.setItem('midseason-roast-tick', String(LIVE_TICK)); }catch(e){} }
     const built = buildScores(parsed.periodScores, parsed.livePeriod);
